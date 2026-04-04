@@ -1,0 +1,15 @@
+    <Project Sdk="Aspire.AppHost.Sdk/13.2.1">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>08b2af0d-92bd-4fda-a7a5-498287fd4212</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.2.1-preview.1.26180.6" />
+  </ItemGroup>
+
+</Project>
