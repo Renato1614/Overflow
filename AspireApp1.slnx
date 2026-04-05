@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/services/">
+    <Project Path="questionService/QuestionService.csproj" />
+  </Folder>
   <Project Path="AspireApp1.AppHost/AspireApp1.AppHost.csproj" />
   <Project Path="AspireApp1.ServiceDefaults/AspireApp1.ServiceDefaults.csproj" />
 </Solution>
