@@ -1,30 +1,29 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestionService.Data;
 using QuestionService.DTO;
 using QuestionService.Models;
+using QuestionService.Services;
 using System.Security.Claims;
+using Wolverine;
+using Wolverine.Shims.MediatR;
 
 namespace QuestionService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class QuestionController(QuestionDbContext db) : ControllerBase
+    public class QuestionController(QuestionDbContext db, IMessageBus bus, TagService tagService) : ControllerBase
     {
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<Question>> CreateQuestion(CreateQuestionDto request)
         {
 
-            var validTags = await db.Tags.Where(t => request.Tags.Contains(t.Slug)).ToListAsync();
-            var missing = request.Tags.Except(validTags.Select(x => x.Slug)).ToList();
-            if (missing.Count() != 0)
-            {
-                return BadRequest($"InvalidTags: {string.Join(", ", missing)}");
-            }
-
+            if (!await tagService.AreTagsValidAsync(request.Tags))
+                return BadRequest("Invalid tags");
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var name = User.FindFirstValue("name");
@@ -42,8 +41,21 @@ namespace QuestionService.Controllers
             db.Questions.Add(question);
             await db.SaveChangesAsync();
 
+            await PublishCreatedQuestion(question);
+
             return Created($"/questions/{question.Id}", question);
 
+        }
+
+        private async Task PublishCreatedQuestion(Question question)
+        {
+            await bus.PublishAsync(new QuestionCreated(
+                            question.Id,
+                            question.Title,
+                            question.Content,
+                            question.CreatedAt,
+                            question.TagSlugs
+                        ));
         }
 
         [HttpGet]
@@ -78,7 +90,12 @@ namespace QuestionService.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId != question.AskerId) return Forbid();
 
+            if (!await tagService.AreTagsValidAsync(dto.Tags))
+                return BadRequest("Invalid tags");
+
             question.Update(dto);
+
+            await bus.PublishAsync(new QuestionUpdated(question.Id, question.Title, question.Content, question.TagSlugs.ToArray()));
 
             await db.SaveChangesAsync();
             return NoContent();
@@ -97,6 +114,8 @@ namespace QuestionService.Controllers
             db.Questions.Remove(question);
             await db.SaveChangesAsync();
 
+            await bus.PublishAsync(new QuestionDeleted(id));
+    
             return NoContent();
         }
     }

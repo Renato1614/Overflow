@@ -17,10 +17,12 @@
     </PackageReference>
     <PackageReference Include="Npgsql" Version="10.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    <PackageReference Include="WolverineFx.RabbitMQ" Version="5.27.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AspireApp1.ServiceDefaults\AspireApp1.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>

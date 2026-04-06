@@ -1,6 +1,10 @@
 <Solution>
+  <Folder Name="/common/">
+    <Project Path="Contracts/Contracts.csproj" Id="1abbda88-fb3a-49e6-839e-668c098c9814" />
+  </Folder>
   <Folder Name="/services/">
     <Project Path="questionService/QuestionService.csproj" />
+    <Project Path="SearchService/SearchService.csproj" />
   </Folder>
   <Project Path="AspireApp1.AppHost/AspireApp1.AppHost.csproj" />
   <Project Path="AspireApp1.ServiceDefaults/AspireApp1.ServiceDefaults.csproj" />
